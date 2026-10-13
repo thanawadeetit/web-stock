@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Barcode Scanner</title>
+    
+    <!-- Tailwind CSS สำหรับจัด Layout ให้ Responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- HTML5 QRCode สำหรับเปิดกล้องสแกน -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    
+    <!-- SweetAlert2 สำหรับแจ้งเตือน -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9fafb; margin: 0; padding: 0; }
+        #reader { width: 100%; border-radius: 8px; overflow: hidden; background: #f3f4f6; }
+        #reader video { object-fit: cover; border-radius: 8px; }
+        
+        /* สไตล์ปุ่มย้อนกลับ */
+        .back-button {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+            color: #4b5563;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .back-button:hover {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body class="text-gray-800 pb-10 relative">
+
+    <!-- ปุ่มลูกศรกลับ -->
+    <a href="https://thanawadeetit.github.io/test-web/?page=POS" class="back-button" title="กลับไปหน้า POS">
+        <i class="fa-solid fa-arrow-left text-xl"></i>
+    </a>
+
+    <div class="max-w-xl mx-auto px-4 pt-16">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold mb-1">Barcode Scanner</h1>
+            <p class="text-gray-500 text-sm">สแกนบาร์โค้ดเพื่อค้นหาสินค้า</p>
+        </div>
+
+        <!-- กล่องสแกนเนอร์ -->
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm relative">
+            <div id="reader-container" class="relative mb-4">
+                <div id="reader" class="min-h-[300px] flex items-center justify-center border-2 border-dashed border-gray-300">
+                    <i class="fa-solid fa-camera text-4xl text-gray-400"></i>
+                </div>
+            </div>
+
+            <button id="btn-scan" onclick="toggleScanner()" class="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 rounded-lg transition-colors">
+                <i class="fa-solid fa-camera mr-2"></i> <span id="btn-scan-text">เริ่มสแกน</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // URL ของ Apps Script (ตัวเดียวกับที่เปิดเว็บหลัก)
+        // ==========================================
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbyVNrsewcM0SPz_Thod1FTghXswNGlZkr3ekyQMQ2xyICx86Tuehe8EYd2-9mPE5WGv1Q/exec'; 
+
+        let html5QrCode;
+        let isScanning = false;
+        let isProcessing = false;
+        const beepSound = new Audio('https://www.soundjay.com/buttons/sounds/beep-07a.mp3');
+
+        window.onload = function() {
+            // เตรียมตัวแปรสแกนเนอร์เมื่อโหลดหน้าเว็บ
+            html5QrCode = new Html5Qrcode("reader");
+            // เปิดกล้องอัตโนมัติ
+            startScanner();
+        };
+
+        function toggleScanner() {
+            if (isScanning) {
+                stopScanner();
+            } else {
+                startScanner();
+            }
+        }
+
+        function startScanner() {
+            const config = { 
+                fps: 10, 
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0
+            };
+
+            // ใช้ facingMode: "environment" เพื่อบังคับใช้กล้องหลัง
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                config, 
+                onScanSuccess,
+                onScanFailure
+            ).then(() => {
+                isScanning = true;
+                document.getElementById('btn-scan-text').innerText = "หยุดสแกน";
+                document.getElementById('btn-scan').classList.replace('bg-gray-900', 'bg-red-600');
+                document.getElementById('btn-scan').classList.replace('hover:bg-gray-800', 'hover:bg-red-700');
+            }).catch(err => {
+                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเข้าถึงกล้องได้: ' + err, 'error');
+            });
+        }
+
+        function stopScanner() {
+            if (html5QrCode && isScanning) {
+                html5QrCode.stop().then(() => {
+                    isScanning = false;
+                    document.getElementById('btn-scan-text').innerText = "เริ่มสแกน";
+                    document.getElementById('btn-scan').classList.replace('bg-red-600', 'bg-gray-900');
+                    document.getElementById('btn-scan').classList.replace('hover:bg-red-700', 'hover:bg-gray-800');
+                }).catch(err => console.error(err));
+            }
+        }
+
+        function onScanFailure(error) {
+            // ไม่ต้องทำอะไร ปล่อยให้สแกนต่อไป
+        }
+
+        // เมื่อสแกนสำเร็จ
+        async function onScanSuccess(decodedText, decodedResult) {
+            if (isProcessing) return; // ป้องกันการยิงซ้ำ
+            isProcessing = true;
+            
+            // หยุดกล้องชั่วคราว
+            stopScanner();
+            beepSound.play().catch(e=>console.log(e));
+
+            Swal.fire({
+                title: 'กำลังตรวจสอบข้อมูล...',
+                text: 'บาร์โค้ด: ' + decodedText,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading()
+                }
+            });
+
+            try {
+                // ส่งรหัสไปเช็คที่ Google Apps Script ผ่าน URL (GET Request)
+                const checkUrl = `${webAppUrl}?action=checkBarcode&barcode=${encodeURIComponent(decodedText)}`;
+                const response = await fetch(checkUrl);
+                const result = await response.json();
+
+                if (result.exists) {
+                    Swal.close();
+                    // เด้งกลับไปหน้า POS พร้อมแนบรหัสไปกับ URL (ส่ง parameter เพิ่มเติม)
+                    window.location.href = `https://thanawadeetit.github.io/test-web/?page=POS&scan=${encodeURIComponent(result.sku)}`;
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ไม่พบสินค้า',
+                        text: `รหัส ${decodedText} ไม่มีในสต๊อก หรือรหัสผิด`,
+                        confirmButtonText: 'สแกนใหม่',
+                        confirmButtonColor: '#3085d6'
+                    }).then((res) => {
+                        if(res.isConfirmed) {
+                            startScanner(); // เปิดกล้องให้สแกนใหม่
+                        }
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ข้อผิดพลาด',
+                    text: 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้: ' + error.message,
+                    confirmButtonText: 'ลองใหม่'
+                }).then(() => {
+                    startScanner();
+                });
+            } finally {
+                isProcessing = false;
+            }
+        }
+    </script>
+</body>
+</html>
