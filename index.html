@@ -35,13 +35,23 @@
     <iframe id="app-iframe" allow="camera; microphone; autoplay; fullscreen"></iframe>
 
     <script>
-        const gasUrl = "https://script.google.com/macros/s/AKfycbzvZipqf2IMsZZj-XnQBJ6d32QDXpXmevBIunlgDqFWr8avaawmmWkKQNtkqdaGVRrW/exec";
+        const gasUrl = "https://script.google.com/macros/s/AKfycbw1B3Az6Ya0tNj8F7x4Zu_dDwOnMwD7NqgSqxjJ1OG_zYzJaLF4De8VGXs994gu2u0ROA/exec";
         const queryString = window.location.search;
         document.getElementById('app-iframe').src = gasUrl + queryString;
 
         window.addEventListener("message", function(event) {
-            if (event.data && event.data.type === 'redirect') {
-                window.location.href = event.data.url;
+            try {
+                let data = event.data;
+                if (typeof data === 'string') { data = JSON.parse(data); }
+
+                if (data && data.type === 'redirect') {
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set('page', data.page);
+                    
+                    window.location.href = currentUrl.toString();
+                }
+            } catch (error) {
+                console.error("Redirect Error:", error);
             }
         });
     </script>
