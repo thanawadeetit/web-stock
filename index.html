@@ -35,9 +35,15 @@
     <iframe id="app-iframe" allow="camera; microphone; autoplay; fullscreen"></iframe>
 
     <script>
-        const gasUrl = "https://script.google.com/macros/s/AKfycbxKaRcGHeCJVpUuLDmQvAtxEnfn6qdiE7q8m7cxc7ehlJO1SbFyNaA7TC7OytP3sBPxKw/exec";
+        const gasUrl = "https://script.google.com/macros/s/AKfycbzvZipqf2IMsZZj-XnQBJ6d32QDXpXmevBIunlgDqFWr8avaawmmWkKQNtkqdaGVRrW/exec";
         const queryString = window.location.search;
         document.getElementById('app-iframe').src = gasUrl + queryString;
+
+        window.addEventListener("message", function(event) {
+            if (event.data && event.data.type === 'redirect') {
+                window.location.href = event.data.url;
+            }
+        });
     </script>
 </body>
 </html>
