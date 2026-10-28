@@ -15,16 +15,24 @@
     <meta name="theme-color" content="#ffffff">
 
     <style>
-        body, html {
+        html, body {
             margin: 0;
             padding: 0;
+            width: 100%;
             height: 100%;
+            height: 100dvh; /* ปรับความสูงตามพื้นที่หน้าจอจริงบนมือถือ */
             overflow: hidden;
-            background-color: #f4f4f4;
+            background-color: #F4F6F9;
         }
         iframe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             width: 100%;
-            height: 100vh;
+            height: 100%;
+            height: 100dvh; /* ป้องกันขอบล่างจมใต้แถบเครื่องมือเบราว์เซอร์ */
             border: none;
             display: block;
         }
