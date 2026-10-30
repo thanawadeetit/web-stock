@@ -20,7 +20,7 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            height: 100dvh; /* ปรับความสูงตามพื้นที่หน้าจอจริงบนมือถือ */
+            height: 100dvh;
             overflow: hidden;
             background-color: #F4F6F9;
         }
@@ -32,7 +32,7 @@
             bottom: 0;
             width: 100%;
             height: 100%;
-            height: 100dvh; /* ป้องกันขอบล่างจมใต้แถบเครื่องมือเบราว์เซอร์ */
+            height: 100dvh;
             border: none;
             display: block;
         }
@@ -43,7 +43,7 @@
     <iframe id="app-iframe" allow="camera; microphone; autoplay; fullscreen"></iframe>
 
     <script>
-        const gasUrl = "https://script.google.com/macros/s/AKfycbyhqrR993X5B4fdc4duEhyYSvuNs1iKlWVexBdFsIgLbNDXKWDPYM9P4va3PW-L3-3l-g/exec";
+        const gasUrl = "https://script.google.com/macros/s/AKfycbySIAqAsgYQghFUe44HrM5LJ3a_qkKiYIh8AewKC1MJbGZAbwWK6bA6NNk12hDxrcMNJg/exec";
         const queryString = window.location.search;
         document.getElementById('app-iframe').src = gasUrl + queryString;
 
