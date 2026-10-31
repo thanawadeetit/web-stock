@@ -49,7 +49,7 @@
 <body class="text-gray-800 pb-10 relative">
 
     <!-- ปุ่มลูกศรกลับ -->
-    <a href="https://thanawadeetit.github.io/test-web/?page=POS" class="back-button" title="กลับไปหน้า POS">
+    <a href="https://thanawadeetit.github.io/web-stock/?page=POS" class="back-button" title="กลับไปหน้า POS">
         <i class="fa-solid fa-arrow-left text-xl"></i>
     </a>
 
@@ -78,7 +78,7 @@
         // ==========================================
         // URL ของ Apps Script (ตัวเดียวกับที่เปิดเว็บหลัก)
         // ==========================================
-        const webAppUrl = 'https://script.google.com/macros/s/AKfycbyVNrsewcM0SPz_Thod1FTghXswNGlZkr3ekyQMQ2xyICx86Tuehe8EYd2-9mPE5WGv1Q/exec'; 
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbyEZWBy5LMXvbVFLEJUATUqBp_G_ekH2axr_fKj2Z8u2o2c6Aa70ly25GDw2StaF6Apfg/exec'; 
 
         let html5QrCode;
         let isScanning = false;
@@ -165,7 +165,7 @@
                 if (result.exists) {
                     Swal.close();
                     // เด้งกลับไปหน้า POS พร้อมแนบรหัสไปกับ URL (ส่ง parameter เพิ่มเติม)
-                    window.location.href = `https://thanawadeetit.github.io/test-web/?page=POS&scan=${encodeURIComponent(result.sku)}`;
+                    window.location.href = `https://thanawadeetit.github.io/web-stock/?page=POS&scan=${encodeURIComponent(result.sku)}`;
                 } else {
                     Swal.fire({
                         icon: 'warning',
