@@ -43,7 +43,7 @@
     <iframe id="app-iframe" allow="camera; microphone; autoplay; fullscreen"></iframe>
 
     <script>
-        const gasUrl = "https://script.google.com/macros/s/AKfycbysTaSzlm6XSK-MewRO_w4NNjH75mfWY9HbU9zk4nD5DTY20NOlCGGDP6gWO5ellZYhpQ/exec";
+        const gasUrl = "https://script.google.com/macros/s/AKfycbz6ACusqmHA4d_NRbe384JPaGAxwxQCxKrSvvkTJYMUtuNGCd_-1bK-KveR7ow-8XcOyg/exec";
         const queryString = window.location.search;
         document.getElementById('app-iframe').src = gasUrl + queryString;
 
@@ -57,6 +57,13 @@
                     currentUrl.searchParams.set('page', data.page);
                     
                     window.location.href = currentUrl.toString();
+                } 
+                // ======== ส่วนที่ต้องเพิ่ม: เคลียร์ Parameter ========
+                else if (data && data.type === 'removeScanParam') {
+                    const currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.delete('scan');
+                    // อัปเดต URL โดยที่หน้าเว็บไม่รีเฟรช
+                    window.history.replaceState({}, document.title, currentUrl.toString());
                 }
             } catch (error) {
                 console.error("Redirect Error:", error);
