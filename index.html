@@ -43,7 +43,7 @@
     <iframe id="app-iframe" allow="camera; microphone; autoplay; fullscreen"></iframe>
 
     <script>
-        const gasUrl = "https://script.google.com/macros/s/AKfycbxv3RnCNAb7wJ9CchuFneWFZyNOyTeNVEUT_aZ4Oq4m1AmjuvAG3TY_EAsx6hBbHTpI2w/exec";
+        const gasUrl = "https://script.google.com/macros/s/AKfycbzBbbjbniyBeNaZgr9z13x0RDAKvYPv5x2Yc3vl9vZHlnXBWmKZMZbzATYz4yRTQreWbQ/exec";
         const queryString = window.location.search;
         document.getElementById('app-iframe').src = gasUrl + queryString;
 
@@ -51,7 +51,6 @@
             try {
                 let data = event.data;
                 if (typeof data === 'string') { data = JSON.parse(data); }
-
                 if (data && data.type === 'redirect') {
                     const currentUrl = new URL(window.location.href);
                     currentUrl.searchParams.set('page', data.page);
@@ -62,18 +61,7 @@
                     currentUrl.searchParams.delete('scan');
                     window.history.replaceState({}, document.title, currentUrl.toString());
                 }
-                // ======== ส่วนที่ต้องเพิ่มใหม่: จัดการตะกร้าสินค้าให้ iframe ========
-                else if (data && data.type === 'saveCart') {
-                    localStorage.setItem('pos_cart_state', JSON.stringify(data.cart));
-                }
-                else if (data && data.type === 'getCart') {
-                    const savedCart = localStorage.getItem('pos_cart_state');
-                    document.getElementById('app-iframe').contentWindow.postMessage({
-                        type: 'loadCart',
-                        cart: savedCart ? JSON.parse(savedCart) : []
-                    }, '*');
-                }
-                // ========================================================
+
             } catch (error) {
                 console.error("Redirect Error:", error);
             }
