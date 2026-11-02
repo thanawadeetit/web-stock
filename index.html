@@ -43,7 +43,7 @@
     <iframe id="app-iframe" allow="camera; microphone; autoplay; fullscreen"></iframe>
 
     <script>
-        const gasUrl = "https://script.google.com/macros/s/AKfycbxJ4RzSyiU4FNrzHk2BvJCi_EmBpyu4lidH3taRNvnPpMaELmJuwb1ysrOIQOsiYwaycA/exec";
+        const gasUrl = "https://script.google.com/macros/s/AKfycbyu42jPhzytdFJDwILO8WZLBVdcbWp1zztt_EMDrBks2dhXtTo25lN-fD5A4FlEPDgQ4w/exec";
         const queryString = window.location.search;
         document.getElementById('app-iframe').src = gasUrl + queryString;
 
@@ -55,16 +55,25 @@
                 if (data && data.type === 'redirect') {
                     const currentUrl = new URL(window.location.href);
                     currentUrl.searchParams.set('page', data.page);
-                    
                     window.location.href = currentUrl.toString();
                 } 
-                // ======== ส่วนที่ต้องเพิ่ม: เคลียร์ Parameter ========
                 else if (data && data.type === 'removeScanParam') {
                     const currentUrl = new URL(window.location.href);
                     currentUrl.searchParams.delete('scan');
-                    // อัปเดต URL โดยที่หน้าเว็บไม่รีเฟรช
                     window.history.replaceState({}, document.title, currentUrl.toString());
                 }
+                // ======== ส่วนที่ต้องเพิ่มใหม่: จัดการตะกร้าสินค้าให้ iframe ========
+                else if (data && data.type === 'saveCart') {
+                    localStorage.setItem('pos_cart_state', JSON.stringify(data.cart));
+                }
+                else if (data && data.type === 'getCart') {
+                    const savedCart = localStorage.getItem('pos_cart_state');
+                    document.getElementById('app-iframe').contentWindow.postMessage({
+                        type: 'loadCart',
+                        cart: savedCart ? JSON.parse(savedCart) : []
+                    }, '*');
+                }
+                // ========================================================
             } catch (error) {
                 console.error("Redirect Error:", error);
             }
